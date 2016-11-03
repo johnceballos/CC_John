@@ -1,7 +1,7 @@
 import gab.opencv.*;
 import processing.video.*;
-int cellsize=20;
-int cols,rows;
+//int cellsize=20;
+//int cols,rows;
 Ball ball1;
 Capture video;
 OpenCV opencv;
@@ -9,15 +9,15 @@ Contour contour;
 
 void captureEvent(Capture video){
   video.read();
-  cols = width/cellsize;
-  rows = height/cellsize;
+  //cols = width/cellsize;
+  //rows = height/cellsize;
 }
 void setup(){
  size(640,480);
  video = new Capture(this,width,height);
  opencv = new OpenCV(this, width, height);
   
- opencv.startBackgroundSubtraction(5, 3, .7);
+ opencv.startBackgroundSubtraction(5, 3, .3);
  video.start();
  ball1 = new Ball(20,20);
 }
@@ -69,19 +69,19 @@ void draw(){
        ball1.direction2 = ball1.direction2* -1;
      }
      
-     if (contour.containsPoint(int(ball1.x-10), int(ball1.y-10)) ==true){
+     if (contour.containsPoint(int(ball1.x-7), int(ball1.y-7)) ==true){
        ball1.direction1 = ball1.direction2*-1;
        ball1.direction2 = ball1.direction1* -1;
      }
-     if (contour.containsPoint(int(ball1.x+10), int(ball1.y-10)) ==true){
+     if (contour.containsPoint(int(ball1.x+7), int(ball1.y-7)) ==true){
        ball1.direction1 = ball1.direction2*-1;
        ball1.direction2 = ball1.direction2* -1;
      }
-     if (contour.containsPoint(int(ball1.x+10), int(ball1.y+10)) ==true){
+     if (contour.containsPoint(int(ball1.x+7), int(ball1.y+7)) ==true){
        ball1.direction2 = ball1.direction1*-1;
        ball1.direction1 = ball1.direction2*-1;
      }
-     if (contour.containsPoint(int(ball1.x+10), int(ball1.y-10)) ==true){
+     if (contour.containsPoint(int(ball1.x+7), int(ball1.y-7)) ==true){
        ball1.direction2 = ball1.direction1*-1;
        ball1.direction1 = ball1.direction2*-1;
      }
