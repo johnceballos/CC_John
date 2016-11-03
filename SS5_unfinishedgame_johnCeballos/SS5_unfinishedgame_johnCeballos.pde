@@ -1,5 +1,3 @@
-//unfinished game, john ceballos, the final plan is to have it so that your motion can change the balls direction
-
 import gab.opencv.*;
 import processing.video.*;
 int cellsize=20;
@@ -7,8 +5,9 @@ int cols,rows;
 Ball ball1;
 Capture video;
 OpenCV opencv;
+Contour contour;
 
-void captureEvent(Capture video){ //reads camera
+void captureEvent(Capture video){
   video.read();
   cols = width/cellsize;
   rows = height/cellsize;
@@ -25,7 +24,7 @@ void setup(){
 void draw(){
   //image(video,0,0);
   /*
-  video.loadPixels();//causes pixelated effect and records pixel color
+  video.loadPixels();
   for(int i=0; i<cols; i++){
     for(int j = 0; j<rows; j++){
        int x = i*cellsize + cellsize/2;
@@ -43,9 +42,9 @@ void draw(){
   }
   */
   background(255,228,129);
-  
+
   opencv.loadImage(video);
-  
+  opencv.flip(1);
   opencv.updateBackground();
   
   opencv.dilate();
@@ -54,20 +53,50 @@ void draw(){
   fill(255,0,0);
   stroke(255, 0, 0);
   strokeWeight(3);
-  for (Contour contour : opencv.findContours()) {// draws contours in live video feed
+  for (Contour contour : opencv.findContours()) {
+    contour.getPolygonApproximation();
     contour.draw();
+     if (contour.containsPoint(int(ball1.x-10), int(ball1.y)) ==true){
+       ball1.direction1 = ball1.direction1* -1;
+     }
+     if (contour.containsPoint(int(ball1.x+10), int(ball1.y)) ==true){
+       ball1.direction1 = ball1.direction1* -1;
+     }
+     if (contour.containsPoint(int(ball1.x), int(ball1.y+10)) ==true){
+       ball1.direction2 = ball1.direction2*  -1;
+     }
+     if (contour.containsPoint(int(ball1.x), int(ball1.y-10)) ==true){
+       ball1.direction2 = ball1.direction2* -1;
+     }
+     
+     if (contour.containsPoint(int(ball1.x-10), int(ball1.y-10)) ==true){
+       ball1.direction1 = ball1.direction2*-1;
+       ball1.direction2 = ball1.direction1* -1;
+     }
+     if (contour.containsPoint(int(ball1.x+10), int(ball1.y-10)) ==true){
+       ball1.direction1 = ball1.direction2*-1;
+       ball1.direction2 = ball1.direction2* -1;
+     }
+     if (contour.containsPoint(int(ball1.x+10), int(ball1.y+10)) ==true){
+       ball1.direction2 = ball1.direction1*-1;
+       ball1.direction1 = ball1.direction2*-1;
+     }
+     if (contour.containsPoint(int(ball1.x+10), int(ball1.y-10)) ==true){
+       ball1.direction2 = ball1.direction1*-1;
+       ball1.direction1 = ball1.direction2*-1;
+     }
+     
   }
-  
   fill(171,5,255);
   ball1.move();
   ball1.display();
 }
 
-class Ball {//classic bouncing ball class
+class Ball {
   
   float x, y;
-  int direction1 = 2;
-  int direction2 = 2;
+  float direction1 = 2;
+  float direction2 = 2.5;
   
   Ball(float xpos, float ypos) {
     x = xpos;
@@ -90,8 +119,8 @@ class Ball {//classic bouncing ball class
       direction2 *= -1;
     }
   }
-
   void display() {
-  ellipse(x, y, 20, 20);
+    ellipseMode(CENTER);
+    ellipse(x, y, 20, 20);
   }
 }
