@@ -2,20 +2,20 @@ import gab.opencv.*;
 import processing.video.*;
 //int cellsize=20;
 //int cols,rows;
-Ball ball1;
+Ball ball1, ball2;
 Capture video;
 OpenCV opencv;
-Contour contour;
+Contour contour, contour2;
 String state= "screen1";
-int count,r1,r2,r3,dir1=1,dir2=1,dir3=1,counter1,counter2;
+int count,r1,r2,r3,dir1=1,dir2=1,dir3=1,counter1,counter2,inc1,inc2;
 float r4,g,b;
-
 
 void captureEvent(Capture video){
   video.read();
   //cols = width/cellsize;
   //rows = height/cellsize;
 }
+
 void setup(){
  state = "pregame";
  size(displayWidth,displayHeight);
@@ -24,9 +24,10 @@ void setup(){
  rectMode(CENTER);
  textAlign(CENTER);
  textSize(32);
- opencv.startBackgroundSubtraction(5, 3, .5);
+ opencv.startBackgroundSubtraction(100, 2, .1);
  video.start();
- ball1 = new Ball(width/8,height/8);
+ ball1 = new Ball(width/8,height/8, 8, 10);
+ ball2 = new Ball(width/2, height/2, 0, 0);
  count=0;
  r1=200;
  r2=200;
@@ -34,6 +35,8 @@ void setup(){
  r4 = 0;
  g = 80;
  b = 180;
+ inc1 = 0;
+ inc2 = 0;
  counter1 = 0;
  counter2 = 0;
 }
@@ -81,30 +84,32 @@ void draw(){
     else if (mouseX<width/3 && mouseY<height/8){
       r1=255;
     }
-    else{
+    else if (mouseX>width/3 && mouseY>height/8){
       r1=200;
     }
-    if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
+    else if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       state="screen2";
       count=0;
     }
     else if (mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       r2=255;
     }
-    else{
+    else if(mouseX > width*2/3 && mouseY > height/8){
       r2=200;
     }
-    if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
+    else if(mouseX < width/3 && mouseY > height/8){
+      r2=200;
+    }
+    else if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
       state="screen3";
       count=0;
     }
-    if (mouseX>width*2/3&& mouseY<height/8){
+    else if (mouseX>width*2/3&& mouseY<height/8){
       r3=255;
     }
-    else{
+    else if (mouseX<width*2/3&& mouseY>height/8){
       r3=200;
     }
-    
   }
   if (state=="screen1"){
     //image(video,0,0);
@@ -212,27 +217,30 @@ void draw(){
     else if (mouseX<width/3 && mouseY<height/8){
       r1=255;
     }
-    else{
+    else if (mouseX>width/3 && mouseY>height/8){
       r1=200;
     }
-    if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
+    else if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       state="screen2";
       count=0;
     }
     else if (mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       r2=255;
     }
-    else{
+    else if(mouseX > width*2/3 && mouseY > height/8){
       r2=200;
     }
-    if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
+    else if(mouseX < width/3 && mouseY > height/8){
+      r2=200;
+    }
+    else if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
       state="screen3";
       count=0;
     }
     else if (mouseX>width*2/3&& mouseY<height/8){
       r3=255;
     }
-    else{
+    else if (mouseX<width*2/3&& mouseY>height/8){
       r3=200;
     }
   }
@@ -244,80 +252,132 @@ void draw(){
     opencv.loadImage(video);
     opencv.flip(1);
     opencv.updateBackground();
-    
+    //<PVector>getPoints();
     opencv.dilate();
     //opencv.erode();
-  
+
     fill(255,0,0);
     stroke(255, 0, 0);
     strokeWeight(3);
     for (Contour contour : opencv.findContours()) {
       contour.getPolygonApproximation();
       contour.draw();
-       if (contour.containsPoint(int(ball1.x-10), int(ball1.y)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;
-         ball1.direction1 = 8;
+       if (contour.containsPoint(int(ball2.x-10), int(ball2.y)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction1 = 8;
        }
-       else if (contour.containsPoint(int(ball1.x+10), int(ball1.y)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;
-         ball1.direction1 = -8;
+       if (contour.containsPoint(int(ball2.x+10), int(ball2.y)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction1 = -8;
        }
-       else if (contour.containsPoint(int(ball1.x), int(ball1.y+10)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;
-         ball1.direction2 = -10;
+       if (contour.containsPoint(int(ball2.x), int(ball2.y+10)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction2 = -10;
        }
-       else if (contour.containsPoint(int(ball1.x), int(ball1.y-10)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;       
-         ball1.direction2 = 10;
+       if (contour.containsPoint(int(ball2.x), int(ball2.y-10)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = 10;
        }
-       else if (contour.containsPoint(int(ball1.x-7), int(ball1.y-7)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;       
-         ball1.direction1 = 8;
-         ball1.direction2 = 10;
+       if (contour.containsPoint(int(ball2.x-7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction1 = 8;
+         ball2.direction2 = 10;
        }
-       else if (contour.containsPoint(int(ball1.x+7), int(ball1.y-7)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;       
-         ball1.direction1 = -8;
-         ball1.direction2 = 10;
+       if (contour.containsPoint(int(ball2.x+7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction1 = -8;
+         ball2.direction2 = 10;
        }
-       else if (contour.containsPoint(int(ball1.x+7), int(ball1.y+7)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;       
-         ball1.direction2 = -8;
-         ball1.direction1 = -10;
+       if (contour.containsPoint(int(ball2.x+7), int(ball2.y+7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = -8;
+         ball2.direction1 = -10;
        }
-       else if (contour.containsPoint(int(ball1.x+7), int(ball1.y-7)) ==true){
-         ball1.x = ball1.x;
-         ball1.y = ball1.y;       
-         ball1.direction2 = -8;
-         ball1.direction1 = 10;
+       if (contour.containsPoint(int(ball2.x+7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = -8;
+         ball2.direction1 = 10;
        }
        
     }
-    
+    fill(0,0,255);
+    stroke(255, 0, 0);
+    strokeWeight(3);
+    for (Contour contour2 : opencv.findContours()) {
+      contour2.getPolygonApproximation();
+      contour2.draw();
+       if (contour2.containsPoint(int(ball2.x-10), int(ball2.y)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction1 = 8;
+       }
+       else if (contour2.containsPoint(int(ball2.x+10), int(ball2.y)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction1 = -8;
+       }
+       else if (contour2.containsPoint(int(ball2.x), int(ball2.y+10)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;
+         ball2.direction2 = -10;
+       }
+       else if (contour2.containsPoint(int(ball2.x), int(ball2.y-10)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = 10;
+       }
+       else if (contour2.containsPoint(int(ball2.x-7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction1 = 8;
+         ball2.direction2 = 10;
+       }
+       else if (contour2.containsPoint(int(ball2.x+7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction1 = -8;
+         ball2.direction2 = 10;
+       }
+       else if (contour2.containsPoint(int(ball2.x+7), int(ball2.y+7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = -8;
+         ball2.direction1 = -10;
+       }
+       else if (contour2.containsPoint(int(ball2.x+7), int(ball2.y-7)) ==true){
+         //ball2.x = ball2.x;
+         //ball2.y = ball2.y;       
+         ball2.direction2 = -8;
+         ball2.direction1 = 10;
+       }
+       
+    }
+
     fill(171,5,255);
-    ball1.move();
-    ball1.display();
-    
-    if (int(ball1.x) >= width/2){
-      counter2 +=1;
-      
+    ball2.move();
+    ball2.display();
+    if (ball2.x > width/2){
+      inc2 =1;
+      inc1=0;
     }
-    else if (int(ball1.x) < width/2){
-      counter1 += 1;
-      
+    else if (ball2.x < width/2){
+      inc1 = 1;
+      inc2=0;
     }
-    
+    counter1 = counter1 +inc1;
+    counter2 = counter2+inc2;
     fill(255);
-    text(counter1/60, 50, height/8 + 50);
-    text(counter2/60, width - 50, height/8 + 50);
-    
+    text(counter1/frameRate, 50, height/8 + 50);
+    text(counter2/frameRate, width - 50, height/8 + 50);
+    //println(frameRate);
     noStroke();
     fill(255,219,88);
     rect(width/2, (height/16), (width), (height/8));
@@ -339,27 +399,30 @@ void draw(){
     else if (mouseX<width/3 && mouseY<height/8){
       r1=255;
     }
-    else{
+    else if (mouseX>width/3 && mouseY>height/8){
       r1=200;
     }
-    if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
+    else if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       state="screen2";
       count=0;
     }
     else if (mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       r2=255;
     }
-    else{
+    else if(mouseX > width*2/3 && mouseY > height/8){
       r2=200;
     }
-    if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
+    else if(mouseX < width/3 && mouseY > height/8){
+      r2=200;
+    }
+    else if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
       state="screen3";
       count=0;
     }
     else if (mouseX>width*2/3&& mouseY<height/8){
       r3=255;
     }
-    else{
+    else if (mouseX<width*2/3&& mouseY>height/8){
       r3=200;
     }
   } 
@@ -370,7 +433,7 @@ void draw(){
     opencv.updateBackground();
       
     opencv.dilate();
-    //opencv.erode();
+    opencv.erode();
     fill(r4,g,b);
     stroke(r4, g, b);
     strokeWeight(3);
@@ -421,27 +484,30 @@ void draw(){
     else if (mouseX<width/3 && mouseY<height/8){
       r1=255;
     }
-    else{
+    else if (mouseX>width/3 && mouseY>height/8){
       r1=200;
     }
-    if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
+    else if (mousePressed && mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       state="screen2";
       count=0;
     }
     else if (mouseX<width*2/3 && mouseX>width/3 && mouseY<height/8){
       r2=255;
     }
-    else{
+    else if(mouseX > width*2/3 && mouseY > height/8){
       r2=200;
     }
-    if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
+    else if(mouseX < width/3 && mouseY > height/8){
+      r2=200;
+    }
+    else if (mousePressed && mouseX>width*2/3 && mouseY<height/8){
       state="screen3";
       count=0;
     }
     else if (mouseX>width*2/3&& mouseY<height/8){
       r3=255;
     }
-    else{
+    else if (mouseX<width*2/3&& mouseY>height/8){
       r3=200;
     }
   }
@@ -450,12 +516,14 @@ void draw(){
 class Ball {
   
   float x, y;
-  float direction1 = 8;
-  float direction2 = 10;
+  float direction1;
+  float direction2;
   
-  Ball(float xpos, float ypos) {
+  Ball(float xpos, float ypos, float direction_1,float direction_2 ) {
     x = xpos;
     y = ypos;
+    direction1 = direction_1;
+    direction2 = direction_2;
   }
  
   void move() {
